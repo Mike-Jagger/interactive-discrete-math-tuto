@@ -1,0 +1,10 @@
+question=Which rows are true under XOR (⊕)?
+type=multiple
+correctIndices=1,2
+hint=XOR is true when exactly one proposition is true.
+maxAttempts=2
+points=10
+option.0=T ⊕ T → False
+option.1=T ⊕ F → True
+option.2=F ⊕ T → True
+option.3=F ⊕ F → False

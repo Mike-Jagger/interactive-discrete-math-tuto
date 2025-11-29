@@ -1,0 +1,8 @@
+question=If you fail both courses, is “Math OR English” true?
+type=single
+correctIndex=0
+hint=OR is true if at least one is true; failing both means False.
+maxAttempts=2
+points=10
+option.0=False
+option.1=True

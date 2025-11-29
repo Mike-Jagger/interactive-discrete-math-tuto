@@ -1,0 +1,10 @@
+question=Which of the following is NOT a valid way to express the conditional statement p → q?
+type=single
+correctIndex=3
+hint=Check the list of alternative expressions for p → q in the lesson.
+maxAttempts=2
+points=10
+option.0=\"if p, then q\"
+option.1=\"p implies q\"
+option.2=\"q if p\"
+option.3=\"p only when q is false\"

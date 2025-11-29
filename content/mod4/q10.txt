@@ -1,0 +1,10 @@
+question=What is the contrapositive of the conditional statement \"If it rains (p), then the ground is wet (q)\"?
+type=single
+correctIndex=2
+hint=The contrapositive switches and negates both parts. It's the only form equivalent to the original.
+maxAttempts=2
+points=10
+option.0=If it does not rain (¬p), then the ground is not wet (¬q)
+option.1=If the ground is wet (q), then it rains (p)
+option.2=If the ground is not wet (¬q), then it did not rain (¬p)
+option.3=If it rains (p), then the ground is wet (q)

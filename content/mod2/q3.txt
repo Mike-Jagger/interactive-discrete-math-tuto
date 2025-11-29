@@ -1,0 +1,10 @@
+question=Which of the following is true under AND (∧)?
+type=single
+correctIndex=0
+hint=AND is only true when both propositions are true.
+maxAttempts=2
+points=10
+option.0=T ∧ T → True
+option.1=T ∧ F → False
+option.2=F ∧ T → False
+option.3=F ∧ F → False

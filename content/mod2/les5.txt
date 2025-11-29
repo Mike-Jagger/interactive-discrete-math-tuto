@@ -1,0 +1,2 @@
+title=Exclusive OR (p ⊕ q)
+quizId=q5

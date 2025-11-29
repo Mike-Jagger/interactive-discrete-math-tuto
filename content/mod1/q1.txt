@@ -1,0 +1,12 @@
+question=Select all statements that are NOT propositions:
+type=multiple
+correctIndices=0,1,2
+hint=Remember, a proposition must declare a fact that is definitely True or False. Questions, commands, and suggestions are NOT propositions.
+maxAttempts=2
+points=20
+option.0=What time is it?
+option.1=Close the door.
+option.2=Please pass the salt.
+option.3=The Sun rises in the east.
+option.4=All squares are rectangles.
+option.5=The Pacific ocean is the smallest ocean in the world.

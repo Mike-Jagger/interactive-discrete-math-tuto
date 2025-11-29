@@ -1,0 +1,2 @@
+title=Section 5: Logical Equivalences
+description=Understanding conditional statements with its different forms

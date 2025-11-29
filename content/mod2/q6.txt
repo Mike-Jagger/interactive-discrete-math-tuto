@@ -1,0 +1,10 @@
+question=Which case makes p → q false?
+type=single
+correctIndex=0
+hint=Implication is only false when p is true and q is false.
+maxAttempts=2
+points=10
+option.0=T → F → False
+option.1=T → T → True
+option.2=F → T → True
+option.3=F → F → True

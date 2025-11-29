@@ -1,0 +1,2 @@
+title=Conjunction (^)
+quizId=q3

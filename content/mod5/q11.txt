@@ -1,0 +1,10 @@
+question=Which of the following statements is logically equivalent to \"If it rains (p), then the ground is wet (q)\"?
+type=single
+correctIndex=2
+hint=Remember, only the contrapositive always has the same truth value as the original conditional.
+maxAttempts=2
+points=10
+option.0=If the ground is wet (q), then it rains (p) [Converse]
+option.1=If it does not rain (¬p), then the ground is not wet (¬q) [Inverse]
+option.2=If the ground is not wet (¬q), then it did not rain (¬p) [Contrapositive]
+option.3=If it rains (p), then the ground is wet (q) [Original statement]
