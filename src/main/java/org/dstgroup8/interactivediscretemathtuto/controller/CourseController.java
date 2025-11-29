@@ -1,7 +1,7 @@
 package org.dstgroup8.interactivediscretemathtuto.controller;
 
-import com.logic.model.Section;
-import com.logic.repository.SectionRepository;
+import org.dstgroup8.interactivediscretemathtuto.model.Section;
+import org.dstgroup8.interactivediscretemathtuto.repository.SectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,10 +48,8 @@ public class CourseController {
     // --- LOGIC ENGINE HELPER ---
     // Generates a simple truth table for P and Q
     private String[][] generateTruthTable(String operation) {
-        //
-
-[Image of Truth Table structure]
-        - We generate this array for the frontend
+        // Image of Truth Table structure
+        //- We generate this array for the frontend
         String[][] table = new String[5][3];
         table[0] = new String[]{"P", "Q", "Result"};
 
