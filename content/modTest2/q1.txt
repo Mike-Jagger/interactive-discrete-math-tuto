@@ -1,0 +1,10 @@
+question=Select all statements that are NOT propositions:
+type=multiple
+correctIndex=0,1,2
+hint=Remember, a proposition must declare a fact that is definitely True or False. Variables without context are ambiguous.
+maxAttempts=2
+points=20
+option.1 = Y + 1 = 10
+option.2 = w + x = v
+option.3 = Is it raining outside
+option.4 = Elephants can fly

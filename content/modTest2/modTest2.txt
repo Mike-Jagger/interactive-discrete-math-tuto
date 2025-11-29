@@ -1,0 +1,2 @@
+title=Section 2: Logical Connectives
+description=Understanding AND, OR, XOR, and IMPLIES.

@@ -1,0 +1,8 @@
+type=single
+correctIndex=1
+hint=The cat owner can't be in the middle. Think about who lives between whom.
+maxAttempts=3
+points=10
+option.0=Mona
+option.1=Gerard
+option.2=Lily

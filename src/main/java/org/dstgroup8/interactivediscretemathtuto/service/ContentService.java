@@ -125,7 +125,7 @@ public class ContentService {
             quiz.question = meta.getOrDefault("question", "");
         }
 
-        // Parse Options (option.0, option.1 OR options=A,B,C)
+        // Parse Options (option.0, option.1 OR options=A,B,C [TODO: not implemented yet])
         // We will look for option.0, option.1, etc. in the properties map
         List<String> opts = new ArrayList<>();
         int i = 0;
