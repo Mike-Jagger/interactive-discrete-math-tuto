@@ -34,7 +34,7 @@ public class ContentService {
             return modules;
         }
 
-        // 1. Scan for Module folders (mod1, mod2, etc.)
+        // Scan for Module folders (mod1, mod2, etc.)
         File[] modDirs = root.listFiles(File::isDirectory);
         if (modDirs == null) return modules;
 
@@ -54,13 +54,13 @@ public class ContentService {
         CourseModels.Module module = new CourseModels.Module();
         module.id = dir.getName();
 
-        // 2. Parse Module Metadata (modX.txt)
+        // Parse Module Metadata (modX.txt)
         File metaFile = new File(dir, dir.getName() + ".txt");
         Map<String, String> meta = parseProperties(metaFile);
         module.title = meta.getOrDefault("title", "Untitled Module");
         module.description = meta.getOrDefault("description", "No description.");
 
-        // 3. Find Lessons (les*.md)
+        // Find Lessons (les*.md)
         File[] lessonFiles = dir.listFiles((d, name) -> name.startsWith("les") && name.endsWith(".md"));
         if (lessonFiles != null) {
             // Sort lessons naturally (les1, les2...)
@@ -86,12 +86,13 @@ public class ContentService {
         Map<String, String> meta = parseProperties(metaFile);
         lesson.title = meta.getOrDefault("title", "Untitled Lesson");
 
-        // Parse Lesson Content (lesX.md) -> HTML
+        // Parse Lesson Content (lesX.md) to HTML
         File contentFile = new File(dir, baseName + ".md");
         lesson.lessonHtml = renderMarkdown(contentFile);
 
-        // 4. Parse Associated Quiz
+        // Parse Associated Quiz
         // Metadata must specify "quizId=qX", otherwise we assume no quiz or try to guess
+        // (Due to no conventional form of storage to associate lessons with their respective quiz)
         String quizId = meta.get("quizId");
         if (quizId != null) {
             lesson.quiz = parseQuiz(dir, quizId);
@@ -112,13 +113,16 @@ public class ContentService {
         quiz.hint = meta.getOrDefault("hint", "No hint available.");
         quiz.maxAttempts = Integer.parseInt(meta.getOrDefault("maxAttempts", "3"));
 
-        // Quiz Question Text (qX.md) - Optional, can override metadata question
+        // Quiz Question Text (qX.md) - Optional, can override metadata question field
         File qContentFile = new File(dir, quizId + ".md");
         if (qContentFile.exists()) {
-            // We strip <p> tags usually for questions, but keeping html is fine
+            // We strip <p> tags usually for questions to keep styling consistent, but keeping html is fine
+            // since we want the user to decide whatever goes in there
             quiz.question = readFileContent(qContentFile);
         } else {
-            quiz.question = meta.getOrDefault("question", "Question text missing.");
+            // quiz.question = meta.getOrDefault("question", "Question text missing.");
+            // No need to display question text if none is intended
+            quiz.question = meta.getOrDefault("question", "");
         }
 
         // Parse Options (option.0, option.1 OR options=A,B,C)
@@ -143,15 +147,14 @@ public class ContentService {
             }
             quiz.correctIndices = list;
             // The frontend code expects "correctIndices" for multiple type
-            // But we need to map it to the right JSON field based on how your frontend expects it.
-            // Your frontend courseData: type="multiple" has "correctIndices": [0,1,2]
+            // But we need to map it to the right JSON field based on how the frontend expects it.
+            // Frontend courseData: type="multiple" has "correctIndices": [0,1,2]
         }
 
         return quiz;
     }
 
-    // --- Helpers ---
-
+    // Helpers
     private String renderMarkdown(File file) {
         String markdown = readFileContent(file);
         Node document = markdownParser.parse(markdown);
