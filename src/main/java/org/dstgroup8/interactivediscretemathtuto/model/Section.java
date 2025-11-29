@@ -1,3 +1,9 @@
+/*
+ * THIS FILE WAS MOSTLY USED TO EXPERIMENT WITH DIFFERENT FEATURES
+ * OF SPRING BOOT AND OTHER LIBRARIES AND THEREFORE IS NOT PART OF THE
+ * FINAL IMPLEMENTATION
+ * */
+
 package org.dstgroup8.interactivediscretemathtuto.model;
 
 import jakarta.persistence.*;

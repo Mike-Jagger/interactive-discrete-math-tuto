@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discrete Structures: Interactive Textbook</title>
+    <style>
+        :root {
+            --primary: #8b2c3a; /* Ashesi Maroon-ish */
+            --secondary: #e6e6e6;
+            --accent: #f59e0b;
+            --text: #333;
+            --success: #10b981;
+            --danger: #ef4444;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: "Segoe UI", Verdana, sans-serif;
+            margin: 0;
+            background-color: #f4f4f9;
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 60px; /* Space for footer */
+        }
+
+        /* --- HEADER / HUD --- */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .hud-stats {
+            display: flex;
+            gap: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- NAVIGATION & LAYOUT --- */
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .view-section {
+            display: none; /* Hidden by default, toggled by JS */
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- CARDS & MODULES --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .module-card {
+            border-left: 5px solid var(--primary);
+            cursor: pointer;
+        }
+        .module-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- LESSON CONTENT STYLES --- */
+        .lesson-content h2 {
+            color: var(--primary);
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .truth-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+        .truth-table th,
+        .truth-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .truth-table th {
+            background-color: var(--primary);
+            color: white;
+        }
+        .truth-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* --- QUIZ STYLES --- */
+        .quiz-option {
+            display: block;
+            /*width: 100%;*/
+            width: full;
+            padding: 15px;
+            margin: 10px 0;
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: #fff5f6;
+        }
+        .quiz-option.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .hint-box {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 5px solid #ffc107;
+            display: none; /* Hidden until triggered */
+        }
+
+        /* --- GAME OVERLAY --- */
+        .game-overlay {
+            text-align: center;
+            padding: 40px;
+            background: #2c3e50;
+            color: white;
+            border-radius: 15px;
+        }
+        .mini-game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 300px;
+            margin: 20px auto;
+        }
+        .game-tile {
+            aspect-ratio: 1;
+            background: #34495e;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .game-tile.active {
+            background: var(--success);
+        }
+
+        /* --- UTILS --- */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            animation: slideIn 0.3s;
+            z-index: 1000;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- HEADER / HUD -->
+<header>
+    <div style="font-size: 1.2rem; font-weight: bold">
+        Discrete Structures
+    </div>
+
+    <div
+            id="module-title"
+            style="font-size: 1.1rem; font-weight: bold; display: none"
+    >
+        <!-- Module title here -->
+    </div>
+
+    <div class="hud-stats" id="hud" style="display: none">
+        <div class="stat-badge">
+            👤 <span id="userDisplay">Student</span>
+        </div>
+        <div class="stat-badge">
+            ❤️ <span id="livesDisplay">3</span>
+        </div>
+        <div class="stat-badge">
+            ⭐ <span id="pointsDisplay">0</span> pts
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- VIEW 1: LOGIN -->
+    <section id="view-login" class="view-section active">
+        <div
+                class="card"
+                style="
+						text-align: center;
+						max-width: 400px;
+						margin: 50px auto;
+					"
+        >
+            <h2>Welcome Back</h2>
+            <p>Enter your name to continue your progress.</p>
+            <input
+                    type="text"
+                    id="usernameInput"
+                    placeholder="Enter Name"
+                    style="padding: 10px; width: 80%; margin-bottom: 10px"
+            />
+            <br />
+            <button class="btn" onclick="app.login()">
+                Start Learning
+            </button>
+        </div>
+    </section>
+
+    <!-- VIEW 2: MODULES LIST -->
+    <section id="view-modules" class="view-section">
+        <h2>Course Modules</h2>
+        <div id="modulesList">
+            <!-- Modules injected by JS -->
+        </div>
+
+        <div
+                style="
+						margin-top: 30px;
+						border-top: 1px solid #ccc;
+						padding-top: 20px;
+					"
+        >
+            <button class="btn btn-secondary" onclick="app.resetData()">
+                Reset All Progress (Debug)
+            </button>
+        </div>
+    </section>
+
+    <!-- VIEW 3: LESSON -->
+    <section id="view-lesson" class="view-section">
+        <div
+                style="
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+						margin-bottom: 8px;
+					"
+        >
+            <button
+                    class="btn btn-secondary"
+                    onclick="app.showView('view-modules')"
+            >
+                ← Back to Modules
+            </button>
+
+            <!-- Lessons dropdown -->
+            <div style="position: relative">
+                <button
+                        class="btn"
+                        id="lessonMenuBtn"
+                        onclick="toggleLessonMenu()"
+                        style="font-size: 1.2rem"
+                >
+                    ☰
+                </button>
+                <div
+                        id="lessonMenu"
+                        style="
+								display: none;
+								position: absolute;
+								right: 0;
+								top: 100%;
+								background: white;
+								border: 1px solid #ccc;
+								border-radius: 0.5rem;
+								box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+								z-index: 10;
+								min-width: 200px;
+							"
+                >
+                    <!-- Lesson items dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="card lesson-content" id="lessonContainer">
+            <!-- Content injected here -->
+        </div>
+        <div
+                style="
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+					"
+        >
+            <div style="text-align: left">
+                <button
+                        class="btn"
+                        id="previousToQuizOrModuleBtn"
+                        onclick="app.previousQuizOrModule()"
+                >
+                    ← Previous
+                </button>
+            </div>
+            <div style="text-align: right">
+                <button
+                        class="btn"
+                        id="nextToQuizBtn"
+                        onclick="app.startQuiz()"
+                >
+                    Proceed to Quiz →
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIEW 4: QUIZ -->
+    <section id="view-quiz" class="view-section">
+        <div class="card">
+            <div
+                    style="
+							display: flex;
+							justify-content: space-between;
+							margin-bottom: 10px;
+							color: #666;
+						"
+            >
+						<span id="quizAttemptsDisplay"
+                        >Attempts remaining: 3</span
+                        >
+                <span>Reward: 100 pts</span>
+            </div>
+            <h3 id="quizQuestion">Question Text</h3>
+            <div id="quizOptions">
+                <!-- Options injected here -->
+            </div>
+
+            <div id="hintContainer" class="hint-box">
+                <strong>💡 Hint:</strong> <span id="hintText"></span>
+            </div>
+
+            <div
+                    style="
+							display: flex;
+							justify-content: space-between;
+							align-items: center;
+						"
+            >
+                <div style="margin-top: 20px; text-align: left">
+                    <button class="btn" onclick="app.previousLesson()">
+                        ← Previous
+                    </button>
+                </div>
+                <div style="margin-top: 20px; text-align: right">
+                    <button class="btn" onclick="app.submitAnswer()">
+                        Submit Answer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIEW 5: GAME (Life Restore) -->
+    <section id="view-game" class="view-section">
+        <div class="game-overlay">
+            <h2>💔 Out of Lives (or Attempts)!</h2>
+            <p>
+                You ran out of attempts for this quiz. You lost 1 Life.
+            </p>
+            <p>
+                <strong>Challenge:</strong> Find the diamond 💎 to earn
+                back a life and unlock the quiz!
+            </p>
+
+            <div class="mini-game-grid" id="gameGrid">
+                <!-- Grid generated by JS -->
+            </div>
+
+            <p
+                    id="gameStatus"
+                    style="margin-top: 20px; height: 20px"
+            ></p>
+            <button
+                    class="btn"
+                    id="returnFromGameBtn"
+                    style="display: none"
+                    onclick="app.returnFromGame()"
+            >
+                Return to Quiz
+            </button>
+        </div>
+    </section>
+</div>
+
+<!-- JAVASCRIPT LOGIC -->
+<script>
+    // --- MOCK DATA (This replaces your database for the template) ---
+    const courseData = [
+        {
+            id: "mod1",
+            title: "Section 1: Propositions",
+            description:
+                "Introduction to propositions, truth values, and logical reasoning.",
+            lessons: [
+                {
+                    id: "les1",
+                    title: "Introduction to Propositions",
+                    lessonHtml: `
+			                 <h2>Introduction to Propositions</h2>
+			                 <p>A proposition is a sentence that declares a fact, and it is either true or false, but not both.</p>
+			                 <div style="background:#eef; padding:15px; border-left:4px solid var(--primary); margin: 10px 0;">
+			                     <strong>Examples:</strong><br>
+			                     - The Sun rises in the east. (True)<br>
+			                     - All squares are rectangles. (True)<br>
+			                     - 2 + 2 = 5. (False)
+			                 </div>
+			                 <p>Propositions are <strong>NOT</strong> questions, commands, or requests (e.g., "Close the door", "What time is it?").</p>
+			             `,
+                    quiz: {
+                        id: "q1",
+                        type: "single", // simple single choice
+                        question:
+                            "Riddle: Who owns the dog? (Based on clues: Gerard, Mona, Lily...)",
+                        options: ["Mona", "Gerard", "Lily"],
+                        correctIndex: 1, // Gerard
+                        hint: "The cat owner can't be in the middle. Think about who lives between whom.",
+                        maxAttempts: 3,
+                    },
+                },
+                {
+                    id: "les2",
+                    title: "test",
+                    lessonHtml: `
+			                 <h2>Test</h2>
+			                 <p>A proposition is a sentence that declares a fact, and it is either true or false, but not both.</p>
+			                 <div style="background:#eef; padding:15px; border-left:4px solid var(--primary); margin: 10px 0;">
+			                     <strong>Examples:</strong><br>
+			                     - The Sun rises in the east. (True)<br>
+			                     - All squares are rectangles. (True)<br>
+			                     - 2 + 2 = 5. (False)
+			                 </div>
+			                 <p>Propositions are <strong>NOT</strong> questions, commands, or requests (e.g., "Close the door", "What time is it?").</p>
+			             `,
+                    quiz: {
+                        id: "q2",
+                        type: "single", // simple single choice
+                        question: "test",
+                        options: ["Mona", "Gerard", "Lily"],
+                        correctIndex: 1, // Gerard
+                        hint: "The cat owner can't be in the middle. Think about who lives between whom.",
+                        maxAttempts: 3,
+                    },
+                },
+            ],
+        },
+        {
+            id: "mod2",
+            title: "Section 2: Logical Connectives",
+            description: "Understanding AND, OR, XOR, and IMPLIES.",
+            lessons: [
+                {
+                    id: "les3",
+                    title: "Logical Connectives",
+                    lessonHtml: `
+			                 <h2>Logical Connectives</h2>
+			                 <p>We use connectives to form compound propositions.</p>
+
+			                 <h3>Conjunction (AND) ∧</h3>
+			                 <table class="truth-table">
+			                     <tr><th>p</th><th>q</th><th>p ∧ q</th></tr>
+			                     <tr><td>T</td><td>T</td><td>T</td></tr>
+			                     <tr><td>T</td><td>F</td><td>F</td></tr>
+			                     <tr><td>F</td><td>T</td><td>F</td></tr>
+			                     <tr><td>F</td><td>F</td><td>F</td></tr>
+			                 </table>
+
+			                 <h3>Disjunction (OR) ∨</h3>
+			                 <p>True if at least one proposition is true.</p>
+			             `,
+                    quiz: {
+                        id: "q3",
+                        type: "multiple", // select all that apply
+                        question:
+                            "Select all statements that are NOT propositions:",
+                        options: [
+                            "Y + 1 = 10",
+                            "w + x = v",
+                            "Is it raining outside?",
+                            "Elephants can fly",
+                        ],
+                        correctIndices: [0, 1, 2], // Variables and questions are not propositions (usually variables are predicates, not props until defined)
+                        hint: "Remember, a proposition must declare a fact that is definitely True or False. Variables without context are ambiguous.",
+                        maxAttempts: 2,
+                    },
+                },
+            ],
+        },
+    ];
+
+    // --- APP ENGINE ---
+    const app = {
+        state: {
+            user: null,
+            lives: 3,
+            points: 0,
+            quizProgress: {}, // { q1: { attemptsLeft: 3, solved: false } }
+            currentModule: null,
+            currentLesson: null,
+        },
+
+        init() {
+            this.loadState();
+            if (this.state.user) {
+                this.updateHud();
+                // DONE: show number of lessons for each module
+                this.showView("view-modules");
+                this.renderModules();
+            }
+        },
+
+        getCompletedQuizes(modId) {
+            const mod = courseData.find((mod) => mod.id === modId);
+
+            let completedQuizes = 0;
+            for (let i = 0; i < mod.lessons.length; i++) {
+                const quizProgress =
+                    this.state.quizProgress[mod.lessons[i].quiz.id];
+                if (quizProgress?.solved) completedQuizes++;
+            }
+
+            return completedQuizes;
+        },
+
+        // AUTH & STATE MANAGEMENT
+        login() {
+            const name = document.getElementById("usernameInput").value;
+            if (!name) return alert("Please enter a name");
+            this.state.user = name;
+            this.saveState();
+            this.updateHud();
+            this.renderModules();
+            this.showView("view-modules");
+        },
+
+        saveState() {
+            localStorage.setItem(
+                "dm_app_state",
+                JSON.stringify(this.state)
+            );
+            this.updateHud();
+        },
+
+        loadState() {
+            const saved = localStorage.getItem("dm_app_state");
+            if (saved) this.state = JSON.parse(saved);
+        },
+
+        resetData() {
+            localStorage.removeItem("dm_app_state");
+            location.reload();
+        },
+
+        updateHud() {
+            document.getElementById("userDisplay").textContent =
+                this.state.user || "Guest";
+            document.getElementById("livesDisplay").textContent =
+                this.state.lives;
+            document.getElementById("pointsDisplay").textContent =
+                this.state.points;
+            document.getElementById("hud").style.display = this.state
+                .user
+                ? "flex"
+                : "none";
+        },
+
+        // NAVIGATION
+        showView(viewId) {
+            document
+                .querySelectorAll(".view-section")
+                .forEach((el) => el.classList.remove("active"));
+            document.getElementById(viewId).classList.add("active");
+        },
+
+        // MODULES LOGIC
+        // DONE: pass in number of lessons per module
+        renderModules(courseCompleted = false, noMoreQuizes = false) {
+            this.updateRoute(false);
+
+            const list = document.getElementById("modulesList");
+            list.innerHTML = courseData
+                .map((mod, index) => {
+                    let notSolved = false;
+                    for (let i = 0; i < mod.lessons.length; i++) {
+                        const quizState =
+                            this.state.quizProgress[
+                                mod.lessons[i].quiz.id
+                                ] || {};
+                        if (!quizState.solved) notSolved = true;
+                    }
+
+                    const statusIcon = !notSolved
+                        ? "✅ Completed"
+                        : "📝 Pending";
+
+                    return `
+			                 <div class="card module-card" onclick="app.openModule(${index}, 0)">
+			                     <div
+				                 	style="
+				                 		display: flex;
+				                 		justify-content: space-between;
+				                 		align-items: center;
+				                 		margin-bottom: 8px;
+				                 	"
+				                 >
+                                 <h3>${mod.title}</h3>
+                                 <!-- Lessons dropdown -->
+					             <div style="position: relative">
+					             	<button
+					             		class="btn"
+					             		id="lessonMenuBtn"
+					             		onclick="event.stopPropagation();toggleHomeLessonMenu(${index})"
+					             		style="font-size: 1.2rem;"
+					             	>
+					             		☰
+					             	</button>
+					             	<div
+					             		id="homeLessonMenu-${index}"
+					             		style="
+					             			display: none;
+					             			position: absolute;
+					             			right: 0;
+					             			top: 100%;
+					             			background: white;
+					             			border: 1px solid #ccc;
+					             			border-radius: 0.5rem;
+					             			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+					             			z-index: 10;
+					             			min-width: 200px;
+					             		"
+					             	>
+					             		<!-- Lesson items dynamically inserted here -->
+					             	</div>
+					             </div>
+                                 </div>
+			                     <p>${mod.description}</p>
+
+			                              <div class="width: full; display: flex; justify-content: space-between;">
+			                                 <small style="color: ${
+                        !notSolved
+                            ? "var(--success)"
+                            : "#666"
+                    }">${statusIcon}</small>
+			                                 <small>
+			                                     ${this.getCompletedQuizes(mod.id)}/${
+                        mod.lessons.length
+                    }
+			                                 </small>
+			                             </div>
+			                </div>
+			                 `;
+                })
+                .join("");
+            if (courseCompleted)
+                alert("Hooray!!! You have completed this course!");
+            if (noMoreQuizes) alert("No more sections to jump to!");
+        },
+
+        renderNextLesson() {
+            const currentLesson = this.state.currentLesson;
+            const currentModule = this.state.currentModule;
+
+            const lessonIndex = currentModule.lessons.findIndex(
+                (lesson) => lesson.id === currentLesson.id
+            );
+
+            const moduleIndex = courseData.findIndex(
+                (mod) => mod.id === currentModule.id
+            );
+
+            console.log(
+                "ModuleIndex: ",
+                moduleIndex,
+                " LessonIndex: ",
+                lessonIndex,
+                " state: ",
+                this.state
+            );
+
+            if (
+                lessonIndex >= 0 &&
+                lessonIndex < currentModule.lessons.length - 1
+            )
+                this.openModule(moduleIndex, lessonIndex + 1);
+            //this.state.currentLesson = currentModule.lessons[lessonIndex + 1];
+            if (
+                lessonIndex < 0 ||
+                lessonIndex >= currentModule.lessons.length
+            )
+                this.openModule(moduleIndex, 0);
+            //this.state.currentLesson = currentModule.lessons[0];
+
+            if (lessonIndex + 1 === currentModule.lessons.length) {
+                if (
+                    moduleIndex >= 0 &&
+                    moduleIndex < courseData.length - 1
+                ) {
+                    this.openModule(moduleIndex + 1, 0);
+                    //this.state.currentModule =
+                    //	courseData[moduleIndex + 1];
+                    //this.state.currentLesson =
+                    //	this.currentModule.lessons[0];
+                }
+
+                if (
+                    moduleIndex < 0 &&
+                    moduleIndex >= courseData.length
+                ) {
+                    this.openModule(0, 0);
+                    //this.state.currentModule = courseData[0];
+                    //this.state.currentLesson =
+                    //	this.currentModule.lessons[0];
+                }
+
+                if (moduleIndex + 1 === courseData.length) {
+                    this.showView("view-modules");
+                    this.renderModules(true);
+                }
+            }
+        },
+
+        renderPreviousLesson() {
+            const currentLesson = this.state.currentLesson;
+            const currentModule = this.state.currentModule;
+
+            const lessonIndex = currentModule.lessons.findIndex(
+                (lesson) => lesson.id === currentLesson.id
+            );
+
+            const moduleIndex = courseData.findIndex(
+                (mod) => mod.id === currentModule.id
+            );
+
+            console.log(
+                "ModuleIndex: ",
+                moduleIndex,
+                " LessonIndex: ",
+                lessonIndex,
+                " state: ",
+                this.state
+            );
+
+            if (
+                lessonIndex > 0 &&
+                lessonIndex < currentModule.lessons.length
+            )
+                this.openModule(moduleIndex, lessonIndex);
+            //this.state.currentLesson = currentModule.lessons[lessonIndex - 1];
+
+            if (
+                lessonIndex < 0 ||
+                lessonIndex >= currentModule.lessons.length
+            )
+                this.openModule(moduleIndex, 0);
+            //this.state.currentLesson = currentModule.lessons[0];
+
+            if (lessonIndex === 0) {
+                this.openModule(moduleIndex, 0);
+            }
+        },
+
+        openModule(index, lessonIndex) {
+            this.state.currentModule = courseData[index];
+            this.state.currentLesson =
+                this.state.currentModule.lessons[lessonIndex];
+            document.getElementById("lessonContainer").innerHTML =
+                this.state.currentLesson.lessonHtml;
+
+            // Initialize quiz state if new
+            const quizId = this.state.currentLesson.quiz.id;
+            if (!this.state.quizProgress[quizId]) {
+                this.state.quizProgress[quizId] = {
+                    attemptsLeft:
+                    this.state.currentLesson.quiz.maxAttempts,
+                    solved: false,
+                };
+                this.saveState();
+            }
+
+            this.showView("view-lesson");
+
+            this.updateRoute();
+        },
+
+        // QUIZ LOGIC
+        startQuiz(jump = false) {
+            const quiz = this.state.currentLesson.quiz;
+            const progress = this.state.quizProgress[quiz.id];
+
+            console.log(quiz, this.state);
+
+            this.updateRoute();
+
+            if (progress.solved) {
+                alert("You have already completed this quiz!");
+                if (jump) {
+                    this.renderPreviousLesson();
+                } else {
+                    this.renderNextLesson();
+                }
+                return;
+            }
+
+            if (progress.attemptsLeft <= 0) {
+                // Force Game Mode
+                this.startMiniGame();
+                return;
+            }
+
+            if (this.state.lives <= 0) {
+                alert(
+                    "You are out of lives! Play the mini-game to restore them."
+                );
+                this.startMiniGame();
+                return;
+            }
+
+            // Render Quiz
+            document.getElementById("quizQuestion").textContent =
+                quiz.question;
+            document.getElementById(
+                "quizAttemptsDisplay"
+            ).textContent = `Attempts remaining: ${progress.attemptsLeft}`;
+            document.getElementById("hintContainer").style.display =
+                "none";
+
+            const optionsContainer =
+                document.getElementById("quizOptions");
+            optionsContainer.innerHTML = quiz.options
+                .map(
+                    (opt, i) => `
+			                 <label class="quiz-option">
+			                     <input type="${
+                        quiz.type === "multiple"
+                            ? "checkbox"
+                            : "radio"
+                    }" name="quiz_opt" value="${i}">
+			                     ${opt}
+			                 </label>
+			             `
+                )
+                .join("");
+
+            this.showView("view-quiz");
+        },
+
+        submitAnswer() {
+            const quiz = this.state.currentLesson.quiz;
+            const progress = this.state.quizProgress[quiz.id];
+            const inputs = document.querySelectorAll(
+                'input[name="quiz_opt"]:checked'
+            );
+
+            if (inputs.length === 0) return alert("Select an answer!");
+
+            // Check correctness
+            let isCorrect = false;
+            if (quiz.type === "single") {
+                isCorrect =
+                    parseInt(inputs[0].value) === quiz.correctIndex;
+            } else {
+                // Multiple choice logic
+                const selected = Array.from(inputs)
+                    .map((i) => parseInt(i.value))
+                    .sort()
+                    .join(",");
+                const correct = quiz.correctIndices.sort().join(",");
+                isCorrect = selected === correct;
+            }
+
+            if (isCorrect) {
+                this.state.points += 100;
+                progress.solved = true;
+                this.saveState();
+                alert("Correct! +100 Points");
+                this.showView("view-modules");
+                // For new assumption, we have multiple lessons per module so we render next lesson instead
+                // this.renderModules();
+                // TODO: implement renderNextLesson()
+                this.renderNextLesson();
+            } else {
+                // Wrong Answer
+                progress.attemptsLeft--;
+                this.saveState();
+                document.getElementById(
+                    "quizAttemptsDisplay"
+                ).textContent = `Attempts remaining: ${progress.attemptsLeft}`;
+
+                // Logic: Attempts run out
+                if (progress.attemptsLeft <= 0) {
+                    this.state.lives--;
+                    this.saveState();
+                    alert(
+                        "No attempts left! You lost a life. Play the game to retry."
+                    );
+                    this.startMiniGame();
+                }
+                // Logic: Show Hint on last attempt
+                else if (progress.attemptsLeft === 1) {
+                    document.getElementById("hintText").textContent =
+                        quiz.hint;
+                    document.getElementById(
+                        "hintContainer"
+                    ).style.display = "block";
+                    alert(
+                        "Wrong! Only 1 attempt left. Check the hint."
+                    );
+                } else {
+                    alert("Wrong answer. Try again.");
+                }
+            }
+        },
+
+        // MINI GAME LOGIC (To restore lives/attempts)
+        startMiniGame() {
+            this.showView("view-game");
+            const grid = document.getElementById("gameGrid");
+            document.getElementById("returnFromGameBtn").style.display =
+                "none";
+            document.getElementById("gameStatus").textContent =
+                "Pick a tile to find the diamond!";
+
+            // 3x3 Grid
+            grid.innerHTML = "";
+            const winningIndex = Math.floor(Math.random() * 9);
+
+            for (let i = 0; i < 9; i++) {
+                const tile = document.createElement("div");
+                tile.className = "game-tile";
+                tile.textContent = "❓";
+                tile.onclick = () => {
+                    if (tile.classList.contains("active")) return;
+
+                    tile.classList.add("active");
+                    if (i === winningIndex) {
+                        tile.textContent = "💎";
+                        tile.style.background = "#10b981"; // Green
+                        this.gameWon();
+                    } else {
+                        tile.textContent = "❌";
+                        tile.style.background = "#ef4444"; // Red
+                    }
+                };
+                grid.appendChild(tile);
+            }
+        },
+
+        gameWon() {
+            document.getElementById("gameStatus").textContent =
+                "You found it! Life restored and Quiz unlocked.";
+            document.getElementById("returnFromGameBtn").style.display =
+                "inline-block";
+
+            // Logic: Restore Life & Reset Quiz Attempts
+            if (this.state.lives < 3) this.state.lives++;
+
+            // Reset the attempts for the current quiz so they can try again
+            const quizId = this.state.currentLesson.quiz.id;
+            this.state.quizProgress[quizId].attemptsLeft =
+                this.state.currentLesson.quiz.maxAttempts;
+
+            this.saveState();
+        },
+
+        previousLesson() {
+            this.renderPreviousLesson();
+        },
+
+        previousQuizOrModule() {
+            const currentLesson = this.state.currentLesson;
+            const currentModule = this.state.currentModule;
+
+            const lessonIndex = currentModule.lessons.findIndex(
+                (lesson) => lesson.id === currentLesson.id
+            );
+
+            const moduleIndex = courseData.findIndex(
+                (mod) => mod.id === currentModule.id
+            );
+
+            console.log(
+                "ModuleIndex: ",
+                moduleIndex,
+                " LessonIndex: ",
+                lessonIndex,
+                " state: ",
+                this.state
+            );
+
+            if (
+                lessonIndex > 0 &&
+                lessonIndex < currentModule.lessons.length
+            )
+                this.state.currentLesson =
+                    currentModule.lessons[lessonIndex - 1];
+            if (
+                lessonIndex < 0 ||
+                lessonIndex >= currentModule.lessons.length
+            )
+                this.state.currentLesson = currentModule.lessons[0];
+
+            if (lessonIndex === 0) {
+                if (
+                    moduleIndex > 0 &&
+                    moduleIndex < courseData.length
+                ) {
+                    this.state.currentModule =
+                        courseData[moduleIndex - 1];
+                    this.state.currentLesson =
+                        this.state.currentModule.lessons[
+                        this.state.currentModule.lessons.length - 1
+                            ];
+                    console.log(
+                        this.state.currentLesson,
+                        this.state.currentModule
+                    );
+                }
+
+                if (
+                    moduleIndex < 0 &&
+                    moduleIndex >= courseData.length
+                ) {
+                    this.state.currentModule = courseData[0];
+                    this.state.currentLesson =
+                        this.currentModule.lessons[0];
+                }
+
+                if (moduleIndex === 0) {
+                    this.renderModules(false, true);
+                    return;
+                }
+            }
+            this.startQuiz(true);
+        },
+
+        updateRoute(show = true) {
+            const router = document.getElementById("module-title");
+            if (show) {
+                router.textContent = this.state.currentModule.title;
+                router.style.display = "block";
+            } else {
+                router.style.display = "none";
+            }
+        },
+
+        getLessonsForCurrentModule(moduleIndex = -1) {
+            let currentModule = this.state.currentModule;
+            if (moduleIndex >= 0 && moduleIndex < courseData.length)
+                currentModule = courseData[moduleIndex];
+
+            if (!currentModule || !currentModule.lessons) return [];
+
+            return currentModule.lessons.map((lesson, index) => ({
+                id: index,
+                title: lesson.title,
+            }));
+        },
+
+        jumpTo(jumpIndex, lessonIndex) {
+            let currentModule = this.state.currentModule;
+            if (jumpIndex >= 0 && jumpIndex < courseData.length)
+                currentModule = courseData[jumpIndex];
+
+            if (!currentModule) return;
+
+            const moduleIndex = courseData.findIndex(
+                (mod) => mod.id === currentModule.id
+            );
+
+            if (moduleIndex === -1)
+                return console.error("Module not found");
+
+            this.openModule(moduleIndex, lessonIndex);
+        },
+
+        returnFromGame() {
+            // Return to the quiz view immediately
+            this.startQuiz();
+        },
+    };
+
+    function toggleLessonMenu(forceClose = false) {
+        populateLessonMenu();
+        const menu = document.getElementById("lessonMenu");
+        const isOpen = menu.style.display === "block";
+
+        if (forceClose) {
+            menu.style.display = "none";
+            return;
+        }
+
+        menu.style.display = isOpen ? "none" : "block";
+    }
+
+    // Detect clicks outside the menu to close it
+    document.addEventListener("click", (event) => {
+        const menu = document.getElementById("lessonMenu");
+        const button = document.getElementById("lessonMenuBtn");
+
+        if (!menu || !button) return;
+
+        if (
+            !menu.contains(event.target) &&
+            !button.contains(event.target)
+        ) {
+            toggleLessonMenu(true);
+        }
+    });
+
+    function toggleHomeLessonMenu(moduleIndex) {
+        populateLessonMenu(moduleIndex);
+        const menu = document.getElementById(
+            "homeLessonMenu-" + moduleIndex
+        );
+        menu.style.display =
+            menu.style.display === "block" ? "none" : "block";
+    }
+
+    function populateLessonMenu(moduleIndex = -1) {
+        let menu;
+
+        if (moduleIndex <= -1)
+            menu = document.getElementById("lessonMenu");
+        else
+            menu = document.getElementById(
+                "homeLessonMenu-" + moduleIndex
+            );
+        menu.innerHTML = ""; // Clear previous entries
+
+        const lessons = app.getLessonsForCurrentModule(moduleIndex); // returns [{ id, title }]
+        lessons.forEach((lesson) => {
+            const item = document.createElement("div");
+            item.textContent = lesson.title;
+            item.style.cssText = `
+			   padding: 8px 12px;
+			   cursor: pointer;
+			 `;
+            item.addEventListener("click", () => {
+                menu.style.display = "none";
+                app.jumpTo(moduleIndex, lesson.id);
+            });
+            item.addEventListener(
+                "mouseover",
+                () => (item.style.background = "#f3f3f3")
+            );
+            item.addEventListener(
+                "mouseout",
+                () => (item.style.background = "transparent")
+            );
+            menu.appendChild(item);
+        });
+    }
+
+    // Start App
+    app.init();
+
+    //document.addEventListener("DOMContentLoaded", populateLessonMenu);
+</script>
+</body>
+</html>

@@ -1,3 +1,9 @@
+/*
+* THIS FILE WAS MOSTLY USED TO EXPERIMENT WITH DIFFERENT FEATURES
+* OF SPRING BOOT AND OTHER LIBRARIES AND THEREFORE IS NOT PART OF THE
+* FINAL IMPLEMENTATION
+* */
+
 package org.dstgroup8.interactivediscretemathtuto.controller;
 
 import org.dstgroup8.interactivediscretemathtuto.model.Section;
@@ -10,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class CourseController {
 
-    @Autowired
+    /*@Autowired
     private SectionRepository sectionRepository;
 
     // --- STUDENT VIEW ---
@@ -76,5 +82,5 @@ public class CourseController {
             case "IMPLIES": return !p || q; // P -> Q is equivalent to !P or Q
             default: return false;
         }
-    }
+    } */
 }
