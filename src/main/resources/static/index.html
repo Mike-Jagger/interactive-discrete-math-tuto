@@ -325,7 +325,7 @@
                 <button
                         class="btn"
                         id="lessonMenuBtn"
-                        onclick="toggleLessonMenu()"
+                        onclick="event.stopPropagation();toggleLessonMenu(false)"
                         style="font-size: 1.2rem"
                 >
                     ☰
@@ -461,7 +461,7 @@
 
 <!-- JAVASCRIPT LOGIC -->
 <script>
-    // --- MOCK DATA (This replaces your database for the template) ---
+    // --- MOCK DATA (This replaces the database for the template) ---
     const courseData = [
         {
             id: "mod1",
@@ -945,6 +945,7 @@
             }
 
             if (isCorrect) {
+                // TODO: Add points system
                 this.state.points += 100;
                 progress.solved = true;
                 this.saveState();
@@ -1158,14 +1159,14 @@
     function toggleLessonMenu(forceClose = false) {
         populateLessonMenu();
         const menu = document.getElementById("lessonMenu");
-        const isOpen = menu.style.display === "block";
 
         if (forceClose) {
             menu.style.display = "none";
             return;
         }
 
-        menu.style.display = isOpen ? "none" : "block";
+        menu.style.display =
+            menu.style.display === "block" ? "none" : "block";
     }
 
     // Detect clicks outside the menu to close it
