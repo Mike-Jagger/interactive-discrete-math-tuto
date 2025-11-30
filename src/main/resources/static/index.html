@@ -395,7 +395,7 @@
 						<span id="quizAttemptsDisplay"
                         >Attempts remaining: 3</span
                         >
-                <span>Reward: 100 pts</span>
+                <span id="quizPoints">Reward: 100 pts</span>
             </div>
             <h3 id="quizQuestion">Question Text</h3>
             <div id="quizOptions">
@@ -918,6 +918,8 @@
                 .join("");
 
             this.showView("view-quiz");
+            document.getElementById("quizPoints").textContent =
+                "Reward: " + (quiz?.points ? quiz.points : 10) + " pts";
         },
 
         submitAnswer() {
@@ -946,10 +948,10 @@
 
             if (isCorrect) {
                 // TODO: Add points system
-                this.state.points += 100;
+                this.state.points += quiz?.points ? quiz.points : 10;
                 progress.solved = true;
                 this.saveState();
-                alert("Correct! +100 Points");
+                alert("Correct! "+(quiz?.points ? quiz.points : 10)+" Points");
                 this.showView("view-modules");
                 // For new assumption, we have multiple lessons per module so we render next lesson instead
                 // this.renderModules();

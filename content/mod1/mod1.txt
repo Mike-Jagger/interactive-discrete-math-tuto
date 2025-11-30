@@ -1,2 +1,2 @@
 title=Section 1: Propositions
-description=ntroduction to propositions, truth values, and logical reasoning.
+description=Introduction to propositions, truth values, and logical reasoning.
